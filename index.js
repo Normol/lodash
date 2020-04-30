@@ -342,3 +342,95 @@ function pull(array, ...values) {
 		}
 	}
 }
+
+//_.remove
+function remove(array, predicate) {
+	let length = array === null ? 0 : array.length
+	if(!length) return
+	let newArr = [], index = -1
+	while(++index < length) {
+		if(predicate(array[index])) {
+			 newArr.push(array[index])
+			 array.splice(index,1)
+			 --index
+		 }
+	}
+	return newArr
+}
+
+//_.reverse
+function reverse(array) {
+	let length = array === null ? 0 : array.length
+	if(!length) return []
+	let index = -1, newArr = array.slice()
+	while(length--) {
+		array[++index] = newArr[length]
+	}
+}
+
+//_.slice
+function slice(array, start, end) {
+	let length = array === null ? 0 : array.length
+	if(!length) return []
+	let startIdx = start === undefined
+				   ? 0
+				   : start >= 0 
+						? start
+						: Math.max(start+length, 0),
+		endIdx = end === undefined || end > length
+						? length
+						: end >= 0 
+							? end
+							: Math.max(end+length, 0),
+		newArray = [], index = -1
+	if(startIdx > endIdx) return []
+	while(startIdx < endIdx) {
+		newArray[++index] = array[startIdx]
+		startIdx++
+	}
+	return newArray
+}
+
+//_.sortedIndex
+// function sortedIndex(array, value) {
+// 	let length = array === null ? 0 : array.length
+// 	if(!length) return
+// 	let index = -1
+// 	while(++index < length) {
+// 		let curVal = array[index]
+// 		let nextVal = array[index+1]
+// 		if(value > curVal && value < nextVal) {
+// 			return ++index
+// 		}
+// 	}
+// }
+
+//_.tail
+function tail(array) {
+	let length = array === null ? 0 : array.length
+	if(!length) return []
+	let newArr = Array(length-1), 
+				start = 1, 
+				index = -1
+	while(++index < length -start) {
+		newArr[index] = array[index+start]
+	}
+	return newArr
+}
+
+//_.take
+function take(array, n) {
+	let length = array === null ? 0 : array.length
+	if(!length) return []
+	let num = n === undefined
+				? 1
+				: n >=0 
+					? Math.min(n, length)
+					: Math.max(n+length, 1),
+		newArr = Array(num),
+		index = -1
+	while(++index < num) {
+		newArr[index] = array[index]
+	}
+	return newArr
+}
