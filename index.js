@@ -434,3 +434,23 @@ function take(array, n) {
 	}
 	return newArr
 }
+
+//_.union
+function union(...arys) {
+	let length = arys === null ? 0 : arys.length
+	if(!length) return []
+	let index = -1, newArr = []
+	while(++index < length) {
+		if(Array.isArray(arys[index])) {
+			let aryIdx = -1, aryLength = arys[index].length
+			while(++aryIdx < aryLength) {
+				let item = arys[index][aryIdx]
+				if(newArr.indexOf(item) === -1) {
+					newArr.push(item)
+				}
+			}
+		}
+	}
+	return newArr
+}
+console.log(union([2],[1,2],[4,3,1]))
