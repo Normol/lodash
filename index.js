@@ -435,7 +435,7 @@ function take(array, n) {
 	return newArr
 }
 
-//_.union
+//_.union 数组合并
 function union(...arys) {
 	let length = arys === null ? 0 : arys.length
 	if(!length) return []
@@ -453,4 +453,57 @@ function union(...arys) {
 	}
 	return newArr
 }
-console.log(union([2],[1,2],[4,3,1]))
+
+// _.uniq 数组去重
+function uniq(array) {
+	let length = array === null ? 0 : array.length
+	if(!length) return []
+	let index = -1, newArray = []
+	while(++index < length) {
+		if(newArray.indexOf(array[index]) === -1) newArray.push(array[index])
+	}
+	return newArray
+}
+function uniqEs6(array) {
+	let length = array === null ? 0 : array.length
+	if(!length) return []
+	let set = new Set(array)
+	return [...set]
+}
+
+//_.zip
+function zip() {
+	let length = arguments.length
+	if(!length) return []
+	let index = -1 , 
+		maxlength = 0,
+		result = []
+	while(++index < length) {
+		if(Array.isArray(arguments[index])) {
+			let len = arguments[index].length
+			maxlength = Math.max(maxlength, len)
+		}
+	}
+	while(maxlength--) {
+		let arr = [], arrIndex = -1
+		while(++arrIndex < length) {
+			if(Array.isArray(arguments[arrIndex]) && (arguments[arrIndex][maxlength] !== undefined)) arr.push(arguments[arrIndex][maxlength])
+		}
+		result[maxlength] = arr
+	}
+	return result
+}
+
+//_.without
+function without(array, ...res) {
+	let length = array === null ? 0 : array.length
+	if(!length) return []
+	let index = -1, result = []
+	while(++index < length) {
+		let item = array[index]
+		if(res.indexOf(item) === -1) {
+			result.push(item)
+		}
+	}
+	return result
+}
