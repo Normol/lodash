@@ -507,3 +507,63 @@ function without(array, ...res) {
 	}
 	return result
 }
+
+// 冒泡排序
+function sort(array) {
+	let length = array === null ? 0 : array.length - 1
+	if(!length) return
+	let outIdx = -1
+	while(++outIdx < length) {
+		let done = true
+			insideIdx = -1
+		while(++insideIdx < length - outIdx) {
+			if(array[insideIdx] > array[insideIdx + 1]) {
+				let temp = array[insideIdx]
+				array[insideIdx] = array[insideIdx + 1]
+				array[insideIdx + 1] = temp
+				done = false
+			}
+		}
+		if(done) {
+			break
+		}
+	}
+	return array
+}
+
+
+// Collection
+
+
+//_.countBy
+function countBy(array, iteratee) {
+	let length = array === null ? 0 : array.length
+	if(!length) return {}
+	let index = -1, obj = {}
+	while(++index < length) {
+		let res = options(array[index], iteratee)
+		if(res && obj.hasOwnProperty(res)) {
+			obj[res]++
+		}else {
+			obj[res] = 1
+		}
+	}
+	return obj
+}
+function identity(val) {
+	return val
+}
+
+function options(item, iteratee) {
+	if(iteratee === undefined) return identity(item)
+	else if(typeof iteratee === 'function') return iteratee(item)
+	else if(Array.isArray(iteratee)) {
+		return iteratee.indexOf(item) !== -1 && iteratee[item]
+	}
+	else if(typeof iteratee === 'string') {
+		return item[iteratee]
+	}
+	else if(typeof iteratee === 'object' && iteratee !== null) {
+		return iteratee.hasOwnProperty(item) && iteratee[item]
+	}
+}
