@@ -534,6 +534,40 @@ function sort(array) {
 
 // Collection
 
+function identity(val) {
+	return val
+}
+
+function arrayIteratee() {
+
+}
+
+function objectIteratee() {
+
+}
+
+function property() {
+
+}
+
+function baseIteratee(iteratee) {
+	let type = Object.prototype.toString.call(iteratee)
+	switch (type) {
+		case "[object Function]":
+			return iteratee
+		case "[object Null]":
+			return identity
+		case "[object Undefined]":
+			return identity
+		case "[object Array]":
+			return arrayIteratee
+		case "[objeck Object]":
+			return objectIteratee
+		default:
+			property(iteratee)
+			break;
+	}
+}
 
 //_.countBy
 function countBy(array, iteratee) {
@@ -541,7 +575,7 @@ function countBy(array, iteratee) {
 	if(!length) return {}
 	let index = -1, obj = {}
 	while(++index < length) {
-		let res = options(array[index], iteratee)
+		let res = options(iteratee).call(null, array[index])
 		if(res && obj.hasOwnProperty(res)) {
 			obj[res]++
 		}else {
@@ -550,20 +584,65 @@ function countBy(array, iteratee) {
 	}
 	return obj
 }
-function identity(val) {
-	return val
-}
 
-function options(item, iteratee) {
-	if(iteratee === undefined) return identity(item)
-	else if(typeof iteratee === 'function') return iteratee(item)
+
+function options(iteratee) {
+	if(iteratee == null) return identity
+	else if(typeof iteratee === 'function') return iteratee
 	else if(Array.isArray(iteratee)) {
-		return iteratee.indexOf(item) !== -1 && iteratee[item]
+		return function(value) { return iteratee.indexOf(value) !== -1 && iteratee[value]}
 	}
 	else if(typeof iteratee === 'string') {
-		return item[iteratee]
+		return function(value) {return (value && value[iteratee])}
 	}
-	else if(typeof iteratee === 'object' && iteratee !== null) {
-		return iteratee.hasOwnProperty(item) && iteratee[item]
+	else if(typeof iteratee === 'object') {
+		return function(value) {return iteratee.hasOwnProperty(value) && iteratee[value]}
 	}
+}
+
+//_.forEach
+function arrayEach(collection, iteratee, direction) {
+	let length = collection == null ? 0 : collection.length,
+			index = direction === 'left' ? -1 : length
+	while(direction === 'left' ? ++index < length : index--) {
+		if(!iteratee(collection[index] , index, collection)) break;
+	}
+	return collection
+}
+
+function objEach() {}
+
+function baseEach(collection, iteratee, direction) {
+	let func = Array.isArray(collection) ? arrayEach : objEach,
+	return func(collection, iteratee, direction)
+}
+
+function forEach(collection, iteratee) {
+	return baseEach(collection, baseIteratee(iteratee), 'left')
+}
+
+function forEachRight(collection, iteratee) {
+	return baseEach(collection, baseIteratee(iteratee), 'right')
+}
+
+// _.every
+function arrayEach(collection, predicate) {
+	let len = collection == null ? 0 : collection.length,
+			index = -1
+	while(++index < len) {
+		if(!predicate(collection[index], index, collection)) return false
+	}
+	return true
+}
+
+function objEvery(collection, predicate) {
+	for(let key in collection) {
+		if(!predicate(collection[key], key, collection)) return false
+	}
+	return true
+}
+
+function every(collection, predicate) {
+	let func = Array.isArray(collection) ? arrayEvery : objEvery,
+	return func(collection, baseIteratee(predicate))
 }
