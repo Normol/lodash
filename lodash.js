@@ -6742,7 +6742,6 @@
       });
       return result;
     });
-
     /**
      * Converts `value` to a string key if it's not a string or symbol.
      *
@@ -9338,7 +9337,7 @@
      * // => Logs 'a' then 'b' (iteration order is not guaranteed).
      */
     function forEach(collection, iteratee) {
-      var func = isArray(collection) ? arrayEach : baseEach;
+      var func = Array.isArray(collection) ? arrayEach : baseEach;
       return func(collection, getIteratee(iteratee, 3));
     }
 
