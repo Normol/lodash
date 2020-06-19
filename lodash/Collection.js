@@ -20,7 +20,7 @@ function converCollection(collection) {
  * @param {[Array,Function,Object,String]} predicate
  * @returns {Ojbect}
  */
-function initData(collection, predicate, fromIndex) {
+function initData(collection, fromIndex, predicate) {
   let data = converCollection(collection),
       length = data.length,
       index = fromIndex < 0 || fromIndex == null
@@ -32,7 +32,7 @@ function initData(collection, predicate, fromIndex) {
     data,
     index,
     length,
-    iteratee: Common.baseIteratee(predicate),
+    iteratee: predicate && Common.baseIteratee(predicate),
   };
 }
 
@@ -46,7 +46,7 @@ function initData(collection, predicate, fromIndex) {
  * @returns
  */
 function dataEach(collection, predicate, setter, fromIndex = -1, initializer) {
-  let {data, index, length, iteratee} = initData(collection, predicate, fromIndex),
+  let {data, index, length, iteratee} = initData(collection, fromIndex, predicate),
       accumulator = initializer ? initializer() : {}
   while(++index < length) {
       let key = Array.isArray(collection) ? index : data[index]
@@ -64,7 +64,7 @@ function dataEach(collection, predicate, setter, fromIndex = -1, initializer) {
  * @returns
  */
 function baseEach(collection, predicate, direction, setter, fromIndex = -1) {
-  let {data, index, length, iteratee} = initData(collection, predicate, fromIndex)
+  let {data, index, length, iteratee} = initData(collection, fromIndex, predicate)
   while(direction === 'leftToRight' ? ++index < length : length--) {
     let key = direction === 'leftToRight' ? index : length,
         value = Array.isArray(collection) ? data[key] : collection[data[key]]
@@ -73,7 +73,6 @@ function baseEach(collection, predicate, direction, setter, fromIndex = -1) {
 }
 
 // _.countBy
-
 /**
  * countBy
  *
@@ -91,7 +90,6 @@ function countBy(collection, predicate) {
 
 
 //_.forEach
-
 function eachSetter(val, key, collection, iteratee) {
   if(!iteratee(val, key, collection)) return true;
 }
@@ -121,7 +119,6 @@ function forEachRight(collection, predicate) {
 }
 
 // _.every
-
 /**
  * every
  *
@@ -130,7 +127,7 @@ function forEachRight(collection, predicate) {
  * @returns
  */
 function every(collection, predicate) {
-  let {data, index ,length, iteratee} = initData(collection, predicate)
+  let {data, index ,length, iteratee} = initData(collection, -1, predicate)
   while(++index < length) {
     let key = Array.isArray(collection) ? index : data[index]
     if(!iteratee(collection[key])) return false
@@ -139,7 +136,6 @@ function every(collection, predicate) {
 }
 
 // _.filter
-
 /**
  * filter
  *
@@ -156,7 +152,6 @@ function filter(collection, predicate) {
 
 
 // _.find
-
 /**
  *
  *
@@ -193,7 +188,6 @@ function findLast(collection, predicate) {
 }
 
 // baseFlatMap
-
 function baseFlatMap(collection, predicate, depth) {
   let iteratee = Common.baseIteratee(predicate)
   return converCollection(collection).reduce(function(result, item) {
@@ -204,7 +198,6 @@ function baseFlatMap(collection, predicate, depth) {
 }
 
 //.flatMap
-
 function flatMap(collection, predicate) {
   let iteratee = baseIteratee(predicate);
   return getCollection(collection).reduce(function (result, item) {
@@ -245,7 +238,6 @@ function flatMapDepthExtendsBase(collection, predicate, depth) {
 }
 
 //.groupBy
-
 /**
  * groupBy
  *
@@ -254,7 +246,7 @@ function flatMapDepthExtendsBase(collection, predicate, depth) {
  * @returns
  */
 function groupBy(collection, predicate) {
-  let { data, iteratee } = initData(collection, predicate);
+  let { data, iteratee } = initData(collection, -1, predicate);
   return data.reduce((res, currentVal) => {
     let key = iteratee(currentVal),
       val = Array.isArray(collection) ? currentVal : collection[currentVal];
@@ -272,7 +264,6 @@ function groupByextendsEach(collection, predicate) {
 }
 
 //.includes
-
 /**
  * includes
  *
@@ -281,21 +272,33 @@ function groupByextendsEach(collection, predicate) {
  * @param {Number} [fromIndex=-1]
  * @returns
  */
-function includes(collection, value, fromIndex = 0) {
-  return typeof collection === "string"
-    ? collection.indexOf(value, fromIndex) > -1
-    : indexOf(collection, value) > -1
+function includes(collection, value, fromIndex = -1) {
+  // typeof String
+  if(typeof collection === 'string') return collection.indexOf(value, fromIndex) > -1
+  // typeof Array | Object
+  let{data, index, length} = initData(collection, fromIndex)
+  while(++index < length) {
+    let key = Array.isArray(collection) ? index : data[index],
+        val = collection[key]
+    if(val === value) return true
+  }
+  return false
 }
 
 //.invokMap
+/**
+ * invokMap
+ *
+ * @param {Array|Object} collection
+ * @param {Array|Function|String} path
+ * @param {...*} args
+ * @returns
+ */
 function invokMap(collection, path, ...args) {
-	let res = Array.isArray(collection) ? collection : Object.keys(collection),
-			index = -1,
-			length = res.length
-	while(++index < length) {
-		res[index] = path.apply(res[index], args)
-	}
-	return res
+  let setter = function(key, value, collection, iteratee, accumulator) {
+    accumulator[key] = iteratee.apply(value, args)
+  }
+  return dataEach(collection, path, setter, -1, () => [])
 }
 
 //.keyBy
@@ -343,10 +346,12 @@ function reject(collection, predicate) {
   }
   return res
 }
+
 // get radom numbers
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max))
 }
+
 //_.sample
 function sample(collection) {
   return baseSample(collection)
@@ -392,5 +397,6 @@ module.exports = {
   flatMap,
   groupBy,
   groupByextendsEach,
-  includes
+  includes,
+  invokMap
 }

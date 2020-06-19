@@ -61,7 +61,11 @@ function testGroupBy() {
 }
 
 function testIncludes() {
-  console.log(Collection.includes([1, 2, 3], 1))
+  console.log(Collection.includes('12', 1))
 }
 
-testIncludes()
+function testInvokMap() {
+  console.log(Collection.invokMap([[5, 1, 7], [3, 2, 1]], 'sort'))
+}
+
+testInvokMap()

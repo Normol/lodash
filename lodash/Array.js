@@ -1,12 +1,8 @@
 // Array
 
-//取整
-function toInteger(value) {
-  var result = toFinite(value),
-    remainder = result % 1;
 
-  return result === result ? (remainder ? result - remainder : result) : 0;
-}
+let Common = require('./Common')
+
 
 function arrPush(array, value) {
   let arrLength = array.length,
@@ -408,20 +404,6 @@ function slice(array, start, end) {
   return newArray;
 }
 
-//_.sortedIndex
-// function sortedIndex(array, value) {
-// 	let length = array === null ? 0 : array.length
-// 	if(!length) return
-// 	let index = -1
-// 	while(++index < length) {
-// 		let curVal = array[index]
-// 		let nextVal = array[index+1]
-// 		if(value > curVal && value < nextVal) {
-// 			return ++index
-// 		}
-// 	}
-// }
-
 //_.tail
 function tail(array) {
   let length = array === null ? 0 : array.length;
@@ -628,8 +610,7 @@ function zipIteratee(val, result, currentVal, innerIndex) {
 
 
 
-const deepChars = (string) => string.replace(/\[|\]/g, '.').split('.')
-              .filter((char) => char)
+const deepChars = (string) => string.replace(/\[|\]/g, '.').split('.').filter((char) => char)
 
 
 /**
@@ -645,7 +626,6 @@ const zipObjectDeep1 = (props, values) => props.reduce((p, c, i) => {
   return result
 }, {})
 
-// const isNumber = (val) => /^(?:0|[1-9]\d*)$/.test(val)
 
 const objectDeep = (prop, value) => {
   let leng = prop.length
@@ -661,9 +641,6 @@ const objectDeep = (prop, value) => {
   return value
 }
 
-console.log(zipObjectDeep(['a.b[0].c', 'a.b[1].d'], [1, 2]))
 
 module.exports = {
-  flattenDep,
-  baseFlatten
 }
