@@ -667,3 +667,62 @@ module.exports = {
   flattenDep,
   baseFlatten
 }
+
+// 节流
+function throttle(fn, time) {
+  let last = 0
+  return function() {
+    let context = this,
+        args = arguments
+    let now = new Date().valueOf()
+    if(now-last >= time) {
+      last = now
+      fn.apply(context, args)
+    }
+  }
+}
+
+function throttle2(fn, time) {
+  let timer = null
+  return function() {
+    let context = this,
+        args = arguments
+    if(!timer) {
+      fn.apply(context, args)
+      timer = setTimeout(() => {}, time);
+    }
+  }
+}
+
+
+// 防抖
+function debounce(fn, time){
+  let timer = null
+  return function() {
+    let context = this,
+        args = arguments
+    if(timer) clearTimeout(timer)
+    else timer = setTimeout(() => {
+      fn.apply(context,args)
+    }, time);
+  }
+}
+
+function debounce1(fn, time) {
+  let timer = null,
+      last = 0
+  return function() {
+    let context = this,
+        args = arguments,
+        now = new Date().valueOf()
+    if(now - last >= time) {
+      last = now
+      fn.apply(context, args)
+    }else {
+      if(timer) clearTimeout(timer)
+      timer = setTimeout(() => {
+        fn.apply(context, args)
+      }, timeout);
+    }
+  }
+}
