@@ -726,3 +726,133 @@ function debounce1(fn, time) {
     }
   }
 }
+
+// instanceof 实现基础类型的区分
+class PrimitiveNumber {
+  static [Symbol.hasInstance](x) {
+    return typeof x === 'number'
+  }
+}
+
+console.log(111 instanceof PrimitiveNumber)
+
+// 实现instanceof
+function MyInstaceof(object, type) {
+  if(typeof object !== 'object' || object === null) return false
+  let proto = Object.getPrototypeOf(object)
+  while(true) {
+    if(proto == null) return false
+    
+    if(proto == type.prototype) return true
+
+    proto = Object.getPrototypeOf(proto)
+  }
+}
+
+console.log(MyInstaceof(new String('111'), String))
+
+
+// 寄生组合式继承
+function Person(name) {
+  this.name = name
+}
+Person.prototype.sayName = function() {
+  console.log(this.name)
+}
+
+function Student(name,grade) {
+  Person.call(this, name)
+  this.grade = grade
+}
+
+Student.prototype = Object.create(Person.prototype)
+Student.prototype.constructor = Student
+
+// clone
+function clone(target, map = new WeakMap()) {
+  if(map.get(target)) {
+    return target
+  }
+  if(typeof target === 'object' && target !== null) {
+    let cloneTarget = Array.isArray(target) ? [] : {}
+    for(let prop in target) {
+      cloneTarget[prop] = clone(target[prop],map) 
+    }
+  }else {
+    return target
+  }
+}
+
+
+function clone(obj, map= new WeakMap()) {
+  if(map.get(obj)) return obj
+  if(typeof obj === 'object' && obj !== null) {
+    map.set(obj, true)
+    let result = Array.isArray(obj) ? [] : {}
+    for(let key in obj) {
+      result[key] = clone(obj[key], map)
+    }
+  }else {
+    return obj
+  }
+}
+
+// map
+function myMap(arr,iteratee) {
+  let length = arr == null ? 0 : arr.length,
+      newArr = [],
+      index = -1
+  while(++index < length) {
+    newArr[index] = iteratee(arr[index])
+  }
+  return newArr
+}
+
+// reduce
+function myReduce(arr, iteratee, init) {
+  let length = arr == null ? 0 : arr.length
+      index = -1,
+      result
+  if(!length) return []
+  if(init == null) {
+    index = 0
+    result = arr[0]
+  } result = init
+  while(++index < length) {
+    result = iteratee(result, index, arr[index], arr)
+  }
+  return result
+}
+
+// call
+Function.prototype.call = function(context,...args) {
+  let context = context || window,
+      result = null,
+      fn = Symbol('fn')
+  context.fn = this
+  result = eval('context.fn(...args)')
+  delete context.fn
+  return result
+}
+
+// apply
+Function.prototype.apply = function(context, args) {
+  let context = context || window,
+      result = null,
+      fn = Symbol('fn')
+  context.fn = this
+  result = eval('context.fn(...args)')
+  delete context.fn
+  return result
+}
+
+// bind
+Function.prototype.bind = function(context, ...args) {
+  if(typeof this !== "function") throw new Error('error')
+  let self = this
+  let fn = function() {
+    self.apply(this instanceof self ? self : context, args.concat(...arguments))
+  }
+  fn.prototype = Object.create(self.prototype)
+  return fn
+}
