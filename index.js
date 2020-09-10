@@ -1,6 +1,6 @@
 // Array
 
-//取整()
+//取整()()
 function toInteger(value) {
   var result = toFinite(value),
     remainder = result % 1;
